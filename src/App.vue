@@ -1,39 +1,25 @@
-<template>
-  <div class="container">
-    <h1>Добро пожаловать в Mini App</h1>
-
-    <div v-if="user">
-      <p>Пользователь: {{ user.first_name }} (ID: {{ user.id }})</p>
-    </div>
-    <div v-else>
-      <p>Telegram WebApp не инициализирован</p>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue';
 
-const user = ref(null)
+const telegramInitialized = ref(false);
 
 onMounted(() => {
-  console.log("App mounted")
-
-  if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.ready()
-    console.log("Telegram SDK detected")
-
-    const tgUser = window.Telegram.WebApp.initDataUnsafe?.user
-    console.log("User:", tgUser)
-
-    if (tgUser) {
-      user.value = tgUser
-    }
+  if (window.Telegram && window.Telegram.WebApp) {
+    telegramInitialized.value = true;
+    window.Telegram.WebApp.ready();
   } else {
-    console.log("Telegram.WebApp not found")
+    telegramInitialized.value = false;
   }
-})
+});
 </script>
+
+<template>
+  <div>
+    <h1>Добро пожаловать в Mini App</h1>
+    <p v-if="!telegramInitialized">Telegram WebApp не инициализирован</p>
+    <p v-else>Telegram WebApp успешно инициализирован!</p>
+  </div>
+</template>
 
 <style scoped>
 .container {
